@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if hibrit_mode %}Hibrit Analiz{% else %}Biber Eş Bulma{% endif %} Sonuçları</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Özel CSS -->
+    <style>
+        :root {
+            --primary-color: #26ad00;
+            --secondary-color: rgb(0, 166, 0);
+            --light-color: #ecf0f1;
+            --accent-color: #ff6b35;
+            --hibrit-color: #26ad00;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--hibrit-color), var(--secondary-color)) !important;
+            color: white;
+        }
+
+        .card-header.koyu-yesil {
+            background: #1e7e1e !important;
+            color: white;
+        }
+
+        .card-header.acik-yesil {
+            background: #66d966 !important;
+            color: white;
+        }
+
+        .card.koyu-yesil-card {
+            border-left: 5px solid #1e7e1e;
+            box-shadow: 0 4px 8px rgba(30, 126, 30, 0.2);
+        }
+
+        .card.acik-yesil-card {
+            border-left: 5px solid #66d966;
+            box-shadow: 0 4px 8px rgba(102, 217, 102, 0.2);
+        }
+
+        .btn-primary {
+            background-color: var(--hibrit-color);
+            border-color: var(--hibrit-color);
+        }
+
+        h1, h2, h3 {
+            color: var(--hibrit-color);
+            font-weight: 600;
+        }
+
+        .result-item {
+            border-left: 4px solid var(--hibrit-color);
+            padding-left: 15px;
+            margin-bottom: 20px;
+        }
+
+        .baba-rank {
+            background: linear-gradient(45deg, var(--accent-color), #ff8c5a);
+            color: white;
+            font-weight: bold;
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+
+        .score-badge {
+            background: linear-gradient(45deg, var(--hibrit-color), #28a745);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .score-badge.koyu-yesil-badge {
+            background: #1e7e1e;
+        }
+
+        .score-badge.acik-yesil-badge {
+            background: #66d966;
+        }
+
+        .gene-list {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .gene-list li {
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .hibrit-genotip {
+            background-color: #e7f3ff;
+            border: 2px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: bold;
+            color: #0066cc;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        .güven-badge {
+            background: linear-gradient(45deg, #17a2b8, #20c997);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .gen-skor {
+            color: #6c757d;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+        .hibrit-mode-indicator {
+            background: linear-gradient(45deg, var(--hibrit-color), #28a745);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .güven-tooltip {
+            cursor: help;
+            border-bottom: 1px dotted #6c757d;
+        }
+
+        .btn-link:focus {
+            box-shadow: none;
+        }
+
+        .card-header .btn-link {
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .card-header .btn-link:hover {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .card-header .btn-link .bi-chevron-down {
+            transition: transform 0.3s ease;
+        }
+
+        .card-header .btn-link:not(.collapsed) .bi-chevron-down {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">
+            {% if hibrit_mode %}
+            <i class="bi bi-dna me-2"></i>Hibrit Genetik Analiz Sonuçları
+            {% else %}
+            <i class="bi bi-search-heart me-2"></i>Biber Eş Bulma Sonuçları
+            {% endif %}
+        </h1>
+
+        {% if hibrit_mode %}
+        <div class="hibrit-mode-indicator">
+            <i class="bi bi-cpu me-2"></i>Gelişmiş Hibrit Analiz Modu Aktif - Mendel Kanunları
+        </div>
+        {% endif %}
+
+        {% if total_records %}
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Veri Özeti:</strong> Toplam {{ total_records }} kayıt - {{ filtered_records }} anne seçildi
+        </div>
+        {% endif %}
+
+        <a href="/" class="btn btn-primary mb-4">
+            <i class="bi bi-arrow-left me-2"></i>Geri Dön
+        </a>
+
+        {% if selected_features %}
+        <div class="mb-3">
+            <strong>Seçili Genetik Özellikler:</strong>
+            {% for col, val in selected_features %}
+                <span class="badge bg-info text-dark ms-2">{{ col }}: {{ val }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% set card_counter = namespace(count=0) %}
+        {% for result in results %}
+            {% if loop.first or results[loop.index0-1].anne_id != result.anne_id %}
+                {% set kart_rengi = "koyu-yesil" if card_counter.count % 2 == 0 else "acik-yesil" %}
+                <div class="card mb-4 shadow {{ kart_rengi }}-card">
+                    <div class="card-header {{ kart_rengi }}">
+                {% set card_counter.count = card_counter.count + 1 %}
+                        <h5 class="mb-0">
+                            <button class="btn btn-link text-white text-decoration-none w-100 text-start {% if not loop.first %}collapsed{% endif %}" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse{{ loop.index0 }}" 
+                                    aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" 
+                                    aria-controls="collapse{{ loop.index0 }}">
+                                <i class="bi bi-gender-female me-2"></i>
+                                Anne: {{ result.anne_id }}
+                                {% for col, val in selected_features %}
+                                    <span class="badge bg-light text-dark ms-2">{{ col }}: {{ result['anne_' + col] if ('anne_' + col) in result else '' }}</span>
+                                {% endfor %}
+                                <span class="badge bg-warning text-dark ms-3">
+                                    <i class="bi bi-list-ol me-1"></i>En İyi 5 Baba
+                                </span>
+                                <i class="bi bi-chevron-down float-end mt-1"></i>
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapse{{ loop.index0 }}" class="collapse {% if loop.first %}show{% endif %}">
+                        <div class="card-body">
+            {% endif %}
+
+            <div class="mb-4 p-3 border rounded">
+                <h6 class="mb-3">
+                    <span class="baba-rank">{{ result.baba_rank }}. Sıra</span>
+                    <i class="bi bi-gender-male me-1"></i>
+                    Baba: {{ result.baba_id }}
+                    {% for col, val in selected_features %}
+                        <span class="badge bg-secondary ms-2">{{ col }}: {{ result['baba_' + col] if ('baba_' + col) in result else '' }}</span>
+                    {% endfor %}
+                </h6>
+                
+                {% if hibrit_mode %}
+                <p class="mb-2"><strong><i class="bi bi-diagram-3 me-1"></i>Hibrit Genetik Analizi:</strong></p>
+                <ul class="gene-list">
+                    {% for col, val in selected_features %}
+                        {% set detay = result.hibrit_detaylar[col] %}
+                        <li>
+                            <strong>{{ col }}:</strong> 
+                            <span class="hibrit-genotip">{{ detay.hibrit_genotip }}</span>
+                            <br>
+                            <small class="text-muted">
+                                Dominant: %{{ detay.dominant_prob }}, 
+                                Heterozigot: %{{ detay.heterozigot_prob }}, 
+                                Resesif: %{{ detay.resesif_prob }}
+                                <span class="güven-badge güven-tooltip" 
+                                      data-bs-toggle="tooltip" 
+                                      data-bs-placement="top" 
+                                      title="Güven Skoru: Mendel kanunlarının kesinlik derecesi. %100=Kesin sonuç, %90=Az belirsizlik, %80=Orta belirsizlik">
+                                    Güven: %{{ detay.güven_skoru }}
+                                </span>
+                            </small>
+                            <div class="gen-skor">Gen Skoru: {{ detay.gen_skor }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="mb-2"><strong><i class="bi bi-diagram-3 me-1"></i>Çocuk Genotipi Olasılıkları:</strong></p>
+                <ul class="gene-list">
+                    <li><strong>Tm0:</strong> %{{ result.probs.Tm0.R }} R, %{{ result.probs.Tm0.HT }} HT, %{{ result.probs.Tm0.S }} S</li>
+                    <li><strong>Tm2:</strong> %{{ result.probs.Tm2.R }} R, %{{ result.probs.Tm2.HT }} HT, %{{ result.probs.Tm2.S }} S</li>
+                    <li><strong>Tswv:</strong> %{{ result.probs.Tswv.R }} R, %{{ result.probs.Tswv.HT }} HT, %{{ result.probs.Tswv.S }} S</li>
+                </ul>
+                {% endif %}
+                
+                <p class="mb-0">
+                    <i class="bi bi-trophy me-1"></i>
+                    <strong>
+                        {% if hibrit_mode %}
+                        Hibrit Direnç Skoru:
+                        {% else %}
+                        Toplam Direnç Skoru:
+                        {% endif %}
+                    </strong>
+                                                              <span class="score-badge {{ kart_rengi }}-badge">{{ "%.3f"|format(result.score) }}</span>
+                </p>
+            </div>
+
+            {% if loop.last or results[loop.index0+1].anne_id != result.anne_id %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        {% if not results %}
+        <div class="alert alert-warning text-center">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Sonuç bulunamadı!</strong> Farklı filtreler deneyiniz.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tooltip'leri aktif hale getir
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+</body>
+
+</html>

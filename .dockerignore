@@ -1,0 +1,10 @@
+# Sanal ortam klasörünü yoksay
+venv/
+*.pyc
+__pycache__/
+.vscode/
+.idea/
+.git
+.gitignore
+README.md
+biber-es-bulma.ipynb

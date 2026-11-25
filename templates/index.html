@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biber Eş Bulma</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .hibrit-header {
+            background: linear-gradient(135deg, #26ad00, rgb(0, 166, 0));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .hibrit-info {
+            background: linear-gradient(135deg, #e7f5e7, #f0fff0);
+            border: 2px solid #b3e5b3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .hibrit-feature {
+            background-color: #f8f9fa;
+            border-left: 4px solid #26ad00;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .btn-hibrit {
+            background: linear-gradient(45deg, #26ad00, rgb(0, 166, 0));
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hibrit:hover {
+            background: linear-gradient(45deg, rgb(0, 166, 0), #28a745);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(38, 173, 0, 0.3);
+        }
+        
+        .card-hibrit {
+            border: 2px solid #e7f5e7;
+            box-shadow: 0 4px 8px rgba(38, 173, 0, 0.1);
+        }
+        
+        .card-hibrit .card-header {
+            background: linear-gradient(135deg, #26ad00, rgb(0, 166, 0));
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="hibrit-header">
+            <h1><i class="bi bi-dna me-3"></i>🌶️ Hibrit Biber Eş Bulma Aracı</h1>
+            <p class="mb-0 mt-2">
+                <i class="bi bi-cpu me-2"></i>
+                Gelişmiş Mendel Kanunları ile Genetik Analiz
+            </p>
+        </div>
+
+        <!-- Flash mesajları -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'error' %}
+                        {% set alert_class = 'alert-danger' %}
+                        {% set icon = 'exclamation-triangle-fill' %}
+                    {% elif category == 'success' %}
+                        {% set alert_class = 'alert-success' %}
+                        {% set icon = 'check-circle-fill' %}
+                    {% elif category == 'warning' %}
+                        {% set alert_class = 'alert-warning' %}
+                        {% set icon = 'exclamation-triangle-fill' %}
+                    {% else %}
+                        {% set alert_class = 'alert-info' %}
+                        {% set icon = 'info-circle-fill' %}
+                    {% endif %}
+                    <div class="alert {{ alert_class }} alert-dismissible fade show" role="alert">
+                        <i class="bi bi-{{ icon }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Veri durumu -->
+        {% if total_records %}
+        <div class="alert alert-info">
+            <i class="bi bi-database me-2"></i>
+            <strong>Mevcut Veri:</strong> {{ total_records }} kayıt yüklendi
+            <a href="{{ url_for('download_excel') }}" class="badge bg-primary ms-2 text-decoration-none" title="Excel dosyasını indir">
+                <i class="bi bi-download me-1"></i>Hibrit Analiz Dosyası
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Hibrit Analiz Açıklaması -->
+        <div class="hibrit-info">
+            <h5 class="mb-3">
+                <i class="bi bi-lightbulb me-2"></i>
+                <strong>Hibrit Genetik Analiz Sistemi</strong>
+            </h5>
+            
+            <div class="hibrit-feature">
+                <h6><i class="bi bi-diagram-3 me-2"></i>Mendel Kanunları Uygulaması</h6>
+                <p class="mb-0">
+                    Gelişmiş hibrit analiz sistemi, Mendel'in kalıtım kanunlarına dayalı bilimsel hesaplamalar yapar.
+                    <strong>R (Dirençli)</strong> dominant, <strong>S (Hassas)</strong> resesif, <strong>Ht (Heterozigot)</strong> ara form olarak işlenir.
+                </p>
+            </div>
+            
+            <div class="hibrit-feature">
+                <h6><i class="bi bi-graph-up me-2"></i>Genotip-Fenotip Analizi</h6>
+                <p class="mb-0">
+                    Beklenen hibrit genotipleri (R/Ht, Ht/S gibi) ve olasılık dağılımları detaylı şekilde gösterilir.
+                    Her gen için ayrı skor hesaplaması yapılır.
+                </p>
+            </div>
+            
+            <div class="hibrit-feature">
+                <h6><i class="bi bi-shield-check me-2"></i>Güven Skoru Sistemi</h6>
+                <p class="mb-2">
+                    Her hibrit tahmini için güvenilirlik seviyesi hesaplanır (0-100%). 
+                    Mendel kanunlarının kesinlik derecesini gösterir:
+                </p>
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="badge bg-success p-2 mb-1 w-100">Güven: %100</div>
+                        <small class="d-block text-muted">R×R → %100 R<br>Kesin sonuç</small>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="badge bg-warning p-2 mb-1 w-100">Güven: %90</div>
+                        <small class="d-block text-muted">R×Ht → %75 R, %25 Ht<br>Az belirsizlik</small>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="badge bg-info p-2 mb-1 w-100">Güven: %80</div>
+                        <small class="d-block text-muted">Ht×Ht → 3 sonuç mümkün<br>Orta belirsizlik</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            <!-- Asıl dosya yükleme alanı (form submit için) -->
+            <div class="card card-hibrit mb-4" style="background: #e3f7ff; border-color: #b3e5fc;">
+                <div class="card-header" style="background: #29b6f6; color: white;">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-excel me-2"></i>Excel Dosyası Yükle (.xlsx)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <input class="form-control" type="file" id="excel_file_main" name="excel_file" accept=".xlsx" required>
+                </div>
+            </div>
+            <!-- Dinamik başlıklar için gizli input kaldırıldı -->
+
+            <!-- Skorlama Yöntemi -->
+            <div class="card card-hibrit mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calculator me-2"></i>Hibrit Skorlama Yöntemi
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="scoring_method" id="method1" value="1"
+                            checked>
+                        <label class="form-check-label" for="method1">
+                            <strong>Ht = R = 1.0</strong> (Eşit Ağırlık)
+                            <br><small class="text-muted">Dirençli ve heterozigot eşit değerde</small>
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="scoring_method" id="method2" value="2">
+                        <label class="form-check-label" for="method2">
+                            <strong>Ht = 1.0, R = 0.7</strong> (Heterozigot Öncelikli)
+                            <br><small class="text-muted">Heterozigot daha yüksek puan</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anne Filtreleme -->
+            <div class="card card-hibrit mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel me-2"></i>Anne Genotip Filtreleme (İsteğe Bağlı)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Sabit dropdownlar kaldırıldı, sadece dinamik alanlar -->
+                    <div id="dynamic-fields"></div>
+                    <div class="alert alert-light border mt-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Filtreleme Nasıl Çalışır:</strong> 
+                        Seçtiğiniz genotipler verimizde bulunan anne örnekleri arasından filtreleme yaparak, 
+                        sadece belirttiğiniz özellikte olan anneleri değerlendirir. 
+                        Boş bırakılan alanlar filtrelenmez.
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-hibrit btn-lg px-5">
+                    <i class="bi bi-dna me-2"></i>Hibrit Analiz Başlat
+                </button>
+            </div>
+
+            {% if message %}
+            <div class="alert alert-warning alert-dismissible fade show mt-3">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.getElementById('excel_file_main').addEventListener('change', function(event) {
+    // Kullanıcı ana inputtan dosya seçtiğinde başlıkları çek
+    const file = event.target.files[0];
+    const dynamicFields = document.getElementById('dynamic-fields');
+    dynamicFields.innerHTML = '';
+    if (file && file.name.endsWith('.xlsx')) {
+        const formData = new FormData();
+        formData.append('excel_file', file);
+        fetch('/get_headers', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.headers) {
+                const headers = data.headers.slice(2);
+                let rowDiv = null;
+                headers.forEach((header, idx) => {
+                    if (idx % 3 === 0) {
+                        rowDiv = document.createElement('div');
+                        rowDiv.className = 'row';
+                        dynamicFields.appendChild(rowDiv);
+                    }
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'col-md-4 mb-3';
+                    const label = document.createElement('label');
+                    label.className = 'form-label mt-2';
+                    label.textContent = header;
+                    const select = document.createElement('select');
+                    select.className = 'form-select mb-2';
+                    select.name = `dynamic_${header}`;
+                    const options = [
+                        { value: '', text: 'Tümü (filtre yok)' },
+                        { value: 'R', text: 'R - Dirençli (Resistant)' },
+                        { value: 'Ht', text: 'Ht - Heterozigot' },
+                        { value: 'S', text: 'S - Hassas (Susceptible)' }
+                    ];
+                    options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.value;
+                        option.textContent = opt.text;
+                        select.appendChild(option);
+                    });
+                    colDiv.appendChild(label);
+                    colDiv.appendChild(select);
+                    rowDiv.appendChild(colDiv);
+                });
+            } else if (data.error) {
+                dynamicFields.innerHTML = `<div class=\"alert alert-danger\">${data.error}</div>`;
+            }
+        })
+        .catch(err => {
+            dynamicFields.innerHTML = `<div class=\"alert alert-danger\">Hata: ${err}</div>`;
+        });
+    }
+});
+</script>
+</body>
+
+</html>
