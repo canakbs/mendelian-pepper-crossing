@@ -13,11 +13,29 @@ A Flask web application that scores and ranks pepper (biber) parent combinations
 - Vectorized scoring with pandas / numpy
 - Results page and Excel export of ranked crosses
 
+## Screenshots
+
+Captured with the synthetic dataset in [sample_data.xlsx](sample_data.xlsx).
+
+**1. Home / upload page**
+
+![Upload page](docs/01-upload.png)
+
+**2. Marker filters for the mother lines**
+
+![Filters](docs/02-filters.png)
+
+**3. Ranked results (top 5 fathers per mother)**
+
+![Results](docs/03-results.png)
+
 ## Project Structure
 
 ```
 app.py                 # Flask app, genotype logic and scoring
 templates/             # index.html (upload/config), results.html
+sample_data.xlsx       # Synthetic demo dataset (random, not real data)
+docs/                  # README screenshots
 biber-es-bulma.ipynb   # Exploratory notebook (expects veri.xlsx)
 requirements.txt
 Dockerfile
@@ -41,7 +59,7 @@ docker run -p 5000:5000 inheritance
 
 ## Input Data
 
-The original dataset is not included. Provide your own Excel file whose first column is the line ID and whose other columns are marker genotypes (`R`, `Ht`, `S`, `NT`).
+The original dataset is not included. Try the app with the synthetic sample_data.xlsx, or provide your own Excel file whose first column is the line ID and whose other columns are marker genotypes (`R`, `Ht`, `S`, `NT`).
 
 ## Notes
 

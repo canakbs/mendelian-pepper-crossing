@@ -1,4 +1,6 @@
 *.xlsx
+!sample_data.xlsx
 __pycache__/
 uploads/
+storage/
 .venv/
